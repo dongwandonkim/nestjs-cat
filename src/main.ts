@@ -10,6 +10,17 @@ async function bootstrap() {
     .setTitle('Cats')
     .setDescription('cat')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth', // This name here is important for matching up with @ApiBearerAuth() in your controller!
+    )
     // .addTag('cats')
     .build();
   const document = SwaggerModule.createDocument(app, config);
@@ -17,7 +28,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
+      whitelist: false,
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());

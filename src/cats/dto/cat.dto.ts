@@ -11,7 +11,7 @@ export class CatDto {
   id: number;
 
   @ApiProperty({
-    example: 'test@test@com',
+    example: 'test@test.com',
     description: 'email',
     required: true,
   })
