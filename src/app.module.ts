@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CatsModule } from './cats/cats.module';
 import { ConfigModule } from '@nestjs/config';
-import { Cat } from './cats/cats.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,10 +18,11 @@ import { Cat } from './cats/cats.entity';
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DBNAME,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      logging: ['query', 'error'],
+      logging: true,
       synchronize: true,
     }),
     CatsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
