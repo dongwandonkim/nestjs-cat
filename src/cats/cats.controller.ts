@@ -7,22 +7,18 @@ import {
   Controller,
   Get,
   Post,
-  Req,
+  UploadedFiles,
   UseFilters,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Serialize } from './interceptors/serialize.interceptor';
 import { HttpExceptionFilter } from '../http-exception.filter';
 import { CatsService } from './cats.service';
 import { createCatDto } from './dto/create-cat.dto';
-import {
-  ApiBearerAuth,
-  ApiHeader,
-  ApiOperation,
-  ApiResponse,
-} from '@nestjs/swagger';
-import { Request } from 'express';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CurrentCat } from './decorators/cat.decorator';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('cats')
 @UseFilters(HttpExceptionFilter)
@@ -34,9 +30,9 @@ export class CatsController {
 
   @ApiOperation({ summary: '내정보' })
   @ApiBearerAuth('JWT-auth')
-  @UseGuards(JwtAuthGuard)
   @Serialize(CatDto)
   @Get()
+  @UseGuards(JwtAuthGuard)
   getCurrentCat(@CurrentCat() cat: CatDto) {
     return cat;
   }
@@ -47,7 +43,7 @@ export class CatsController {
     description: '성공',
     type: CatDto,
   })
-  @Post('signup')
+  @Post('/signup')
   @Serialize(CatDto)
   signUp(@Body() body: createCatDto) {
     return this.catService.signup(body);
@@ -60,8 +56,16 @@ export class CatsController {
   }
 
   @ApiOperation({ summary: '사진 업로드' })
-  @Post('upload/cats')
-  uploadCatImg() {
+  @UseInterceptors(FilesInterceptor('image'))
+  @Post('/upload')
+  uploadCatImg(@UploadedFiles() files: Array<Express.Multer.File>) {
+    console.log(files);
     return 'upload img';
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  test() {
+    return '하이';
   }
 }
